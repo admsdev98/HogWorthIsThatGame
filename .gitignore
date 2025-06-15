@@ -1,0 +1,19 @@
+# Entorno virtual
+venv/
+.env
+
+# Python
+__pycache__/
+*.pyc
+
+# Node.js / React
+src/frontend/node_modules/
+src/frontend/.env
+
+# Base de datos
+*.sqlite3
+*.db
+
+# Otros
+.DS_Store
+*.log
