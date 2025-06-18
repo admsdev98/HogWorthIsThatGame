@@ -1,20 +1,23 @@
 import os
-import requests
+import httpx
 from dotenv import load_dotenv
 
 load_dotenv()
 
-API_KEY = os.getenv('RAWG_API_KEY')
-BASE_URL = 'https://api.rawg.io/api'
+RAWG_API_KEY = os.getenv('RAWG_API_KEY')
+RAWG_API_URL = os.getenv('RAWG_API_URL')
+
 
 async def get_info_from_rawg(title: str):
-    search_url = f"{BASE_URL}/games"
+    search_url = f"{RAWG_API_URL}/games"
     search_params = {
-        "key": API_KEY,
+        "key": RAWG_API_KEY,
         "search": title,
         "page_size": 1
     }
 
-    response = requests.get(search_url, params=search_params)
-    data = response.json()
-    return data['results'][0]
+    async with httpx.AsyncClient() as client:
+        response = await client.get(search_url, params=search_params)
+        data = response.json()
+
+    return data['results'][0] if data['results'] else None

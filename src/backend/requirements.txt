@@ -1,8 +1,8 @@
 fastapi
 redis
-redispy
 sqlalchemy
 alembic
 uvicorn[standard]
 howlongtobeatpy
 python-dotenv
+httpx
