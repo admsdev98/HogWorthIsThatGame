@@ -2,6 +2,7 @@ import os
 import httpx
 from dotenv import load_dotenv
 from backend.db.sqlite import Database
+from backend.models.steam import SteamData
 
 DB_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "db", "hwitg.db"))
 
@@ -33,7 +34,7 @@ async def get_info_from_steam(title: str):
     async with httpx.AsyncClient() as client:
         response = await client.get(url, params=params)
         data = response.json()
-        return data
+        return map_steam_info(data, title)
 
 
 def get_game_id_from_steam(title: str):
@@ -44,3 +45,32 @@ def get_game_id_from_steam(title: str):
     if not steam_game_id:
         return None
     return steam_game_id[0][0]
+
+
+def map_steam_info(steam_info, title=None):
+    if not steam_info:
+        return None
+
+    if not steam_info.get("success"):
+        return None
+
+    query_summary = steam_info.get("query_summary", {})
+    review_score = query_summary.get("review_score")
+    review_score_desc = query_summary.get("review_score_desc")
+
+    reviews = steam_info.get("reviews", [])
+
+    return SteamData(
+        name=title,
+        score=review_score,
+        top_media_scores=[
+            {
+                "source": "Steam",
+                "score": review_score,
+                "label": review_score_desc
+            }
+        ] if review_score is not None else [],
+        top_reviews=reviews[:10] if reviews else []
+    )
+
+
